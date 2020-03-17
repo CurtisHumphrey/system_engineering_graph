@@ -1,0 +1,42 @@
+{
+  "name": "system_engineering_graph",
+  "version": "1.0.0",
+  "description": "Graph your system to understand your system",
+  "main": "index.js",
+  "repository": "git@github.com:CurtisHumphrey/system_engineering_graph.git",
+  "author": "Curtis M. Humphrey, Ph.D <curtis@createdwithflair.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "cytoscape": "^3.14.0",
+    "cytoscape-fcose": "^1.2.0",
+    "react": "^16.13.0",
+    "react-cytoscapejs": "^1.2.1",
+    "react-dom": "^16.13.0",
+    "react-scripts": "3.4.0",
+    "styled-components": "^5.0.1"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
