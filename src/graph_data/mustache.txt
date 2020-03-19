@@ -1,0 +1,10 @@
+Mustache[system] --> AWS EFS[system] : write
+Mustache[system] <-- AWS EFS[system] : read
+Mustache[system] <-- Source Code[data] : build with
+Source Code --> GitHub[system] : write
+Source Code <-- GitHub[system] : read
+Mustache[system] --> Template[data] : write
+Mustache[system] <-- Template[data] : read
+Mustache[system] --> Docker Image[data] : builds
+Docker Image[data] <-- Kubernetes[system] : read
+Kubernetes[system] --> AWS EC2[system] : running

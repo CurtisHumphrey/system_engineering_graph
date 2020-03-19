@@ -3,6 +3,7 @@ import './App.css'
 import CytoscapeComponent from 'react-cytoscapejs'
 import cytoscape from 'cytoscape'
 import cola from 'cytoscape-cola'
+import parse_md_to_elements from './parse_md_to_elements'
 
 cytoscape.use( cola )
 
@@ -72,33 +73,16 @@ const stylesheet = [
   },
 ]
 
-const elements = [
-  { data: { id: 'AWS EC2', type: 'system' }},
-  { data: { id: 'AWS EFS', type: 'system' }},
-  { data: { id: 'Kubernetes', type: 'system' }},
-  { data: { id: 'GitHub', type: 'system' }},
-  { data: { id: 'Mustache', type: 'system' }},
+const all_graph_data = require.context('!raw-loader!./graph_data', false, /.*\.txt/)
 
-  { data: { id: 'Template', type: 'data' }},
-  { data: { id: 'Source Code', type: 'data' }},
-  { data: { id: 'Docker Image', type: 'data' }},
+let raw_text = ''
+all_graph_data.keys().forEach((key) => {
+  const file = all_graph_data(key).default.trim()
+  console.log(file)
+  raw_text += '\n' + file
+})
 
-  { data: { id: 'more:Docker Image', type: 'more'}},
-  { data: { source: 'more:Docker Image', target: 'Docker Image', label: 'builds' } },
-
-  { data: { source: 'Kubernetes', target: 'AWS EC2', label: 'running' } },
-  { data: { source: 'Mustache', target: 'Docker Image', label: 'builds' } },
-  { data: { source: 'Kubernetes', target: 'Docker Image', label: 'read' } },
-  { data: { source: 'Mustache', target: 'AWS EFS', label: 'write' } },
-  { data: { source: 'AWS EFS', target: 'Mustache', label: 'read' } },
-  { data: { source: 'Mustache', target: 'Template', label: 'write' } },
-  { data: { source: 'Template', target: 'Mustache', label: 'read' } },
-  { data: { source: 'Source Code', target: 'Mustache', label: 'build with' } },
-
-  { data: { source: 'Source Code', target: 'GitHub', label: 'write' } },
-  { data: { source: 'GitHub', target: 'Source Code', label: 'read' } },
-];
-
+const elements = parse_md_to_elements(raw_text)
 
 function App() {
   return (
