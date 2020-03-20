@@ -3428,6 +3428,11 @@ cytoscape-spread@^3.0.0:
   dependencies:
     weaverjs "^1.2.0"
 
+cytoscape-view-utilities@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/cytoscape-view-utilities/-/cytoscape-view-utilities-3.1.0.tgz#120d5a0fb62bac80fdab928060cece737719ccd1"
+  integrity sha512-KkaY8QTF+Yj+K+74M9UKQvY7E80iS/n/LH424awyq6FV/ANoF8hR0czTNYaTX+wuHUmx7SNHmpmVZ6ULqOqdtA==
+
 cytoscape@^3.14.0, cytoscape@^3.2.19:
   version "3.14.0"
   resolved "https://registry.yarnpkg.com/cytoscape/-/cytoscape-3.14.0.tgz#fa23e38209bebb759415dbbd88f8320b37e9ae56"

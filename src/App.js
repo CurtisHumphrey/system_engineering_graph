@@ -3,6 +3,7 @@ import './App.css'
 import CytoscapeComponent from 'react-cytoscapejs'
 import cytoscape from 'cytoscape'
 import cola from 'cytoscape-cola'
+
 import parse_md_to_elements from './parse_md_to_elements'
 
 cytoscape.use( cola )
@@ -87,7 +88,21 @@ function App() {
   return (
     <div>
       <div style={ { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } }>
-        <CytoscapeComponent elements={elements} stylesheet={stylesheet} layout={layout} style={ { width: '100%', height: '100%' } } />
+        <CytoscapeComponent 
+          elements={elements} 
+          stylesheet={stylesheet} 
+          layout={layout} 
+          style={ { width: '100%', height: '100%' } }
+          cy={(cy) => {
+            cy.on('tap', 'node', (event) => {
+              const node = event.target
+              const neighbors = node.closedNeighborhood()
+              cy.nodes().difference(neighbors).style('display', 'none')
+              neighbors.style('display', 'element')
+              neighbors.layout(layout).run()
+            })
+          }}
+        />
       </div>
     </div>
   )
