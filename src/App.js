@@ -78,7 +78,6 @@ const all_graph_data = require.context('!raw-loader!./graph_data', false, /.*\.t
 let raw_text = ''
 all_graph_data.keys().forEach((key) => {
   const file = all_graph_data(key).default.trim()
-  console.log(file)
   raw_text += '\n' + file
 })
 
