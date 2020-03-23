@@ -1,7 +1,34 @@
 // inspired by https://github.com/mermaid-js/mermaid
 
+
+export default function parse_context_to_elements(require_context) {
+  let matches = []
+  require_context.keys().forEach((filename) => {
+    const lines = require_context(filename).default.trim()
+    matches = matches.concat(get_matches(filename, lines))
+  })
+
+  return matches_to_elements(matches)
+}
+
 //               ( 1      )     ( 2 )     (   3   ) ( 4      )     ( 5 )          (6 )
-const pattern = /([\w\d ]+)(?:\[(\w+)\])? (<--|-->) ([\w\d ]+)(?:\[(\w+)\])?(?: : (.+)$)/gm
+const pattern = /^([\w\d ]+)(?:\[(\w+)\])? (<--|-->) ([\w\d ]+)(?:\[(\w+)\])?(?: : (.+)$)/
+
+function get_matches(filename, lines) {
+  const each_line = lines.trim().split('\n')
+
+  let match
+  const matches = []
+  each_line.forEach((line) => {
+    match = pattern.exec(line.trim())
+    if (match == null) {
+      console.warn(`Unable to parse "${line}" in file ${filename}`)
+    } else {
+      matches.push(match)
+    }
+  })
+  return matches
+}
 
 function convert_match (match) {
   const node_1 = {
@@ -22,18 +49,7 @@ function convert_match (match) {
   }
 }
 
-function matchAll(pattern, input) {
-  let match
-  const matches = []
-  while ((match = pattern.exec(input.trim())) !== null) {
-    matches.push(match)
-  }
-  return matches
-}
-
-export default function parse_md_to_elements (mermaidish_string) {
-  const matches = matchAll(pattern, mermaidish_string)
-
+function matches_to_elements (matches) {
   const nodes_by_id = {}
   const elements = []
   matches.forEach((match) => {

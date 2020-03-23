@@ -4,7 +4,7 @@ import CytoscapeComponent from 'react-cytoscapejs'
 import cytoscape from 'cytoscape'
 import cola from 'cytoscape-cola'
 
-import parse_md_to_elements from './parse_md_to_elements'
+import parse_context_to_elements from './graph_logic/parse_context_to_elements'
 
 cytoscape.use( cola )
 
@@ -76,13 +76,7 @@ const stylesheet = [
 
 const all_graph_data = require.context('!raw-loader!./graph_data', false, /.*\.txt/)
 
-let raw_text = ''
-all_graph_data.keys().forEach((key) => {
-  const file = all_graph_data(key).default.trim()
-  raw_text += '\n' + file
-})
-
-const elements = parse_md_to_elements(raw_text)
+const elements = parse_context_to_elements(all_graph_data)
 
 function App() {
   return (
@@ -96,10 +90,11 @@ function App() {
           cy={(cy) => {
             cy.on('tap', 'node', (event) => {
               const node = event.target
-              const neighbors = node.closedNeighborhood()
-              cy.nodes().difference(neighbors).style('display', 'none')
-              neighbors.style('display', 'element')
-              neighbors.layout(layout).run()
+              let subgraph = node.closedNeighborhood()
+              subgraph = subgraph.merge(node.predecessors())
+              cy.nodes().difference(subgraph).style('display', 'none')
+              subgraph.style('display', 'element')
+              subgraph.layout(layout).run()
             })
           }}
         />
