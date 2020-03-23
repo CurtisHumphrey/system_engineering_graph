@@ -6,11 +6,25 @@
   "repository": "git@github.com:CurtisHumphrey/system_engineering_graph.git",
   "author": "Curtis M. Humphrey, Ph.D <curtis@createdwithflair.com>",
   "license": "MIT",
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "lint-staged"
+    }
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "lint": "eslint ./src --cache",
     "eject": "react-scripts eject"
+  },
+  "lint-staged": {
+    "*.{js|jsx|scss|json|html|yaml|md}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.{js|jsx}": "eslint --cache"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -44,6 +58,13 @@
     ]
   },
   "devDependencies": {
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
+    "commitizen": "^4.0.3",
+    "cz-conventional-changelog": "^3.1.0",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.8",
+    "prettier": "^2.0.1",
     "raw-loader": "^4.0.0"
   }
 }

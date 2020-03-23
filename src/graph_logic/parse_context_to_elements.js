@@ -1,6 +1,5 @@
 // inspired by https://github.com/mermaid-js/mermaid
 
-
 export default function parse_context_to_elements(require_context) {
   let matches = []
   require_context.keys().forEach((filename) => {
@@ -30,7 +29,7 @@ function get_matches(filename, lines) {
   return matches
 }
 
-function convert_match (match) {
+function convert_match(match) {
   const node_1 = {
     id: match[1],
   }
@@ -45,25 +44,25 @@ function convert_match (match) {
 
   return {
     nodes: [node_1, node_2],
-    connection: {source, target, label: match[6]}
+    connection: { source, target, label: match[6] },
   }
 }
 
-function matches_to_elements (matches) {
+function matches_to_elements(matches) {
   const nodes_by_id = {}
   const elements = []
   matches.forEach((match) => {
-    const {nodes, connection} = convert_match(match)
+    const { nodes, connection } = convert_match(match)
 
     nodes.forEach((node) => {
       nodes_by_id[node.id] = Object.assign({}, node, nodes_by_id[node.id])
     })
 
-    elements.push({ data: connection})
+    elements.push({ data: connection })
   })
 
   Object.keys(nodes_by_id).forEach((id) => {
-    elements.push({ data: nodes_by_id[id]})
+    elements.push({ data: nodes_by_id[id] })
   })
 
   return elements

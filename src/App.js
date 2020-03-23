@@ -1,30 +1,37 @@
 import React from 'react'
-import './App.css'
 import CytoscapeComponent from 'react-cytoscapejs'
 import cytoscape from 'cytoscape'
 import cola from 'cytoscape-cola'
 
 import parse_context_to_elements from './graph_logic/parse_context_to_elements'
 
-cytoscape.use( cola )
+cytoscape.use(cola)
 
 const layout = { name: 'cola', nodeDimensionsIncludeLabels: true }
 
-function background_color (node) {
-  switch(node.data('type')) {
-    case 'data': return '#D5E8D4'
-    case 'system': return '#DAE8FC'
-    case 'more': return '#EEE'
-    default: return 'red'
+function background_color(node) {
+  switch (node.data('type')) {
+    case 'data':
+      return '#D5E8D4'
+    case 'system':
+      return '#DAE8FC'
+    case 'more':
+      return '#EEE'
+    default:
+      return 'red'
   }
 }
 
-function outline_color (node) {
-  switch(node.data('type')) {
-    case 'data': return '#82B366'
-    case 'system': return '#6C8EBF'
-    case 'more': return '#999'
-    default: return 'red'
+function outline_color(node) {
+  switch (node.data('type')) {
+    case 'data':
+      return '#82B366'
+    case 'system':
+      return '#6C8EBF'
+    case 'more':
+      return '#999'
+    default:
+      return 'red'
   }
 }
 
@@ -33,21 +40,27 @@ const stylesheet = [
     selector: 'node',
     style: {
       label(node) {
-        switch(node.data('type')) {
-          case 'more': return '+'
-          default: return node.data('id')
+        switch (node.data('type')) {
+          case 'more':
+            return '+'
+          default:
+            return node.data('id')
         }
       },
-      shape (node) {
-        switch(node.data('type')) {
-          case 'data': return 'round-hexagon'
-          case 'system': return 'round-rectangle'
-          case 'more': return 'circle'
-          default: return 'octagon'
+      shape(node) {
+        switch (node.data('type')) {
+          case 'data':
+            return 'round-hexagon'
+          case 'system':
+            return 'round-rectangle'
+          case 'more':
+            return 'circle'
+          default:
+            return 'octagon'
         }
       },
       'text-valign': 'center',
-      'color': 'white',
+      color: 'white',
       'text-outline-width': 2,
       'border-width': 2,
       'font-size': 10,
@@ -59,10 +72,10 @@ const stylesheet = [
   {
     selector: 'edge',
     style: {
-      label: "data(label)",
+      label: 'data(label)',
       width: 4,
       'font-size': 10,
-      'color': 'white',
+      color: 'white',
       'text-outline-width': 1,
       'text-outline-color': '#555',
       'target-arrow-shape': 'triangle',
@@ -81,12 +94,12 @@ const elements = parse_context_to_elements(all_graph_data)
 function App() {
   return (
     <div>
-      <div style={ { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } }>
-        <CytoscapeComponent 
-          elements={elements} 
-          stylesheet={stylesheet} 
-          layout={layout} 
-          style={ { width: '100%', height: '100%' } }
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+        <CytoscapeComponent
+          elements={elements}
+          stylesheet={stylesheet}
+          layout={layout}
+          style={{ width: '100%', height: '100%' }}
           cy={(cy) => {
             cy.on('tap', 'node', (event) => {
               const node = event.target
@@ -103,4 +116,4 @@ function App() {
   )
 }
 
-export default App;
+export default App
