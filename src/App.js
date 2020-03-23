@@ -1,13 +1,16 @@
 import React from 'react'
+import styled from 'styled-components'
 import CytoscapeComponent from 'react-cytoscapejs'
 import cytoscape from 'cytoscape'
 import cola from 'cytoscape-cola'
+
+import AppHeader from './components/AppHeader'
 
 import parse_context_to_elements from './graph_logic/parse_context_to_elements'
 
 cytoscape.use(cola)
 
-const layout = { name: 'cola', nodeDimensionsIncludeLabels: true }
+const layout = { name: 'cola', nodeDimensionsIncludeLabels: true, animate: true }
 
 function background_color(node) {
   switch (node.data('type')) {
@@ -92,28 +95,61 @@ const all_graph_data = require.context('!raw-loader!./graph_data', false, /.*\.t
 const elements = parse_context_to_elements(all_graph_data)
 
 function App() {
+  const cy_ref = React.useRef(null)
+  const [selected_name, set_selected] = React.useState('')
+
+  const onUnselect = React.useCallback(() => {
+    const cy = cy_ref.current
+    cy.elements().style('display', 'element')
+    cy.elements().layout(layout).run()
+  }, [])
+
+  const onTapNode = React.useCallback((event) => {
+    const cy = cy_ref.current
+    const node = event.target
+    set_selected(node.id())
+
+    let subgraph = node.closedNeighborhood()
+    subgraph = subgraph.merge(node.predecessors())
+    cy.nodes().difference(subgraph).style('display', 'none')
+    subgraph.style('display', 'element')
+    subgraph.layout(layout).run()
+  }, [])
+
   return (
-    <div>
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
-        <CytoscapeComponent
-          elements={elements}
-          stylesheet={stylesheet}
-          layout={layout}
-          style={{ width: '100%', height: '100%' }}
-          cy={(cy) => {
-            cy.on('tap', 'node', (event) => {
-              const node = event.target
-              let subgraph = node.closedNeighborhood()
-              subgraph = subgraph.merge(node.predecessors())
-              cy.nodes().difference(subgraph).style('display', 'none')
-              subgraph.style('display', 'element')
-              subgraph.layout(layout).run()
-            })
-          }}
-        />
-      </div>
-    </div>
+    <Root>
+      <AppHeader onUnselect={onUnselect} selected={selected_name} />
+      <GraphCell>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+          <CytoscapeComponent
+            elements={elements}
+            stylesheet={stylesheet}
+            layout={layout}
+            style={{ width: '100%', height: '100%' }}
+            cy={(cy) => {
+              cy_ref.current = cy
+              cy.on('tap', 'node', onTapNode)
+            }}
+          />
+        </div>
+      </GraphCell>
+    </Root>
   )
 }
 
 export default App
+
+const Root = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+`
+
+const GraphCell = styled.div`
+  position: relative;
+  flex-grow: 1;
+`

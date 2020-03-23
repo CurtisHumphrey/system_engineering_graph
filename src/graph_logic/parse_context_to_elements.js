@@ -19,7 +19,11 @@ function get_matches(filename, lines) {
   let match
   const matches = []
   each_line.forEach((line) => {
-    match = pattern.exec(line.trim())
+    line = line.trim()
+    if (!line) return // empty line used to help group
+    if (line[0] === '#') return // comment line
+
+    match = pattern.exec(line)
     if (match == null) {
       console.warn(`Unable to parse "${line}" in file ${filename}`)
     } else {
