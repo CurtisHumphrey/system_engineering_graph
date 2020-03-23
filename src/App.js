@@ -100,6 +100,7 @@ function App() {
 
   const onUnselect = React.useCallback(() => {
     const cy = cy_ref.current
+    set_selected('')
     cy.elements().style('display', 'element')
     cy.elements().layout(layout).run()
   }, [])
