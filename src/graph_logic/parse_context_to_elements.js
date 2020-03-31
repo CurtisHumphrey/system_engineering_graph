@@ -1,8 +1,10 @@
 // inspired by https://github.com/mermaid-js/mermaid
+import _ from 'lodash'
 
 export default function parse_context_to_elements(require_context) {
   let matches = []
   require_context.keys().forEach((filename) => {
+    console.log(filename)
     const lines = require_context(filename).default.trim()
     matches = matches.concat(get_matches(filename, lines))
   })
@@ -69,5 +71,5 @@ function matches_to_elements(matches) {
     elements.push({ data: nodes_by_id[id] })
   })
 
-  return elements
+  return _.uniqWith(elements, _.isEqual)
 }

@@ -90,7 +90,7 @@ const stylesheet = [
   },
 ]
 
-const all_graph_data = require.context('!raw-loader!./graph_data', false, /.*\.txt/)
+const all_graph_data = require.context('!raw-loader!./graph_data', true, /.*\.txt/)
 
 const elements = parse_context_to_elements(all_graph_data)
 
