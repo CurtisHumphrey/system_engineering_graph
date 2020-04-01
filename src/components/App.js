@@ -3,10 +3,11 @@ import styled from 'styled-components'
 import CytoscapeComponent from 'react-cytoscapejs'
 import cytoscape from 'cytoscape'
 import cola from 'cytoscape-cola'
+import { useHistory, useParams } from 'react-router-dom'
 
-import AppHeader from './components/AppHeader'
+import AppHeader from './AppHeader'
 
-import parse_context_to_elements from './graph_logic/parse_context_to_elements'
+import parse_context_to_elements from '../graph_logic/parse_context_to_elements'
 
 cytoscape.use(cola)
 
@@ -90,32 +91,80 @@ const stylesheet = [
   },
 ]
 
-const all_graph_data = require.context('!raw-loader!./graph_data', true, /.*\.txt/)
+const all_graph_data = require.context('!raw-loader!../graph_data', true, /.*\.txt/)
 
 const elements = parse_context_to_elements(all_graph_data)
 
+function better_id(id) {
+  id = id.replace(/-/g, '~')
+  return id.replace(/ /g, '-')
+}
+function reverse_better_id(slug) {
+  if (!slug) return ''
+  slug = slug.replace(/~/g, '-')
+  return slug.replace(/-/g, ' ')
+}
+
 function App() {
   const cy_ref = React.useRef(null)
+  const [cy_is_set, set_cy_is_set] = React.useState(false)
   const [selected_name, set_selected] = React.useState('')
+  const history = useHistory()
+  const { focus_id } = useParams()
 
   const onUnselect = React.useCallback(() => {
     const cy = cy_ref.current
     set_selected('')
+    history.push('/')
+
     cy.elements().style('display', 'element')
     cy.elements().layout(layout).run()
-  }, [])
+  }, [history])
 
-  const onTapNode = React.useCallback((event) => {
-    const cy = cy_ref.current
-    const node = event.target
-    set_selected(node.id())
+  const onSelect = React.useCallback(
+    (id) => {
+      const cy = cy_ref.current
+      const node = cy.getElementById(id)
+      set_selected(id)
+      history.push(`/focus-on/${better_id(id)}`)
 
-    let subgraph = node.closedNeighborhood()
-    subgraph = subgraph.merge(node.predecessors())
-    cy.nodes().difference(subgraph).style('display', 'none')
-    subgraph.style('display', 'element')
-    subgraph.layout(layout).run()
-  }, [])
+      let subgraph = node.closedNeighborhood()
+      subgraph = subgraph.merge(node.predecessors())
+      cy.nodes().difference(subgraph).style('display', 'none')
+      subgraph.style('display', 'element')
+      subgraph.layout(layout).run()
+    },
+    [history],
+  )
+
+  React.useEffect(() => {
+    if (!cy_is_set) return
+    const id = reverse_better_id(focus_id)
+    if (id === selected_name) return
+    if (id) {
+      onSelect(id)
+    } else {
+      onUnselect(id)
+    }
+  }, [cy_is_set, onSelect, focus_id])
+
+  const onTapNode = React.useCallback(
+    (event) => {
+      const node = event.target
+      onSelect(node.id())
+    },
+    [onSelect],
+  )
+
+  const on_cy_callback = React.useCallback(
+    (cy) => {
+      cy_ref.current = cy
+      set_cy_is_set(true)
+      cy.removeAllListeners()
+      cy.on('tap', 'node', onTapNode)
+    },
+    [onTapNode],
+  )
 
   return (
     <Root>
@@ -127,10 +176,7 @@ function App() {
             stylesheet={stylesheet}
             layout={layout}
             style={{ width: '100%', height: '100%' }}
-            cy={(cy) => {
-              cy_ref.current = cy
-              cy.on('tap', 'node', onTapNode)
-            }}
+            cy={on_cy_callback}
           />
         </div>
       </GraphCell>
