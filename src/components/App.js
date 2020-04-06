@@ -93,7 +93,7 @@ const stylesheet = [
 
 const all_graph_data = require.context('!raw-loader!../graph_data', true, /.*\.txt/)
 
-const elements = parse_context_to_elements(all_graph_data)
+const { nodes, elements } = parse_context_to_elements(all_graph_data)
 
 function better_id(id) {
   id = id.replace(/-/g, '~')
@@ -137,16 +137,23 @@ function App() {
     [history],
   )
 
+  const onChangeSelect = React.useCallback(
+    (id) => {
+      if (id === selected_name) return
+      if (id) {
+        onSelect(id)
+      } else {
+        onUnselect(id)
+      }
+    },
+    [selected_name, onSelect, onUnselect],
+  )
+
   React.useEffect(() => {
     if (!cy_is_set) return
     const id = reverse_better_id(focus_id)
-    if (id === selected_name) return
-    if (id) {
-      onSelect(id)
-    } else {
-      onUnselect(id)
-    }
-  }, [cy_is_set, onSelect, focus_id])
+    onChangeSelect(id)
+  }, [cy_is_set, focus_id, onChangeSelect])
 
   const onTapNode = React.useCallback(
     (event) => {
@@ -168,7 +175,7 @@ function App() {
 
   return (
     <Root>
-      <AppHeader onUnselect={onUnselect} selected={selected_name} />
+      <AppHeader onChangeSelect={onChangeSelect} selected={selected_name} options={nodes} />
       <GraphCell>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
           <CytoscapeComponent

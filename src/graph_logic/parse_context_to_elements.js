@@ -1,6 +1,11 @@
 // inspired by https://github.com/mermaid-js/mermaid
 import _ from 'lodash'
 
+/*
+  Takes a webpack require_context and converts it into a cytoscape data format
+  nodes {id, type}
+  edges {source, target, label}
+*/
 export default function parse_context_to_elements(require_context) {
   let matches = []
   require_context.keys().forEach((filename) => {
@@ -56,7 +61,7 @@ function convert_match(match) {
 
 function matches_to_elements(matches) {
   const nodes_by_id = {}
-  const elements = []
+  let edges = []
   matches.forEach((match) => {
     const { nodes, connection } = convert_match(match)
 
@@ -64,12 +69,18 @@ function matches_to_elements(matches) {
       nodes_by_id[node.id] = Object.assign({}, node, nodes_by_id[node.id])
     })
 
-    elements.push({ data: connection })
+    edges.push({ data: connection })
   })
 
-  Object.keys(nodes_by_id).forEach((id) => {
-    elements.push({ data: nodes_by_id[id] })
-  })
+  edges = _.uniqWith(edges, _.isEqual)
 
-  return _.uniqWith(elements, _.isEqual)
+  const nodes = _.map(nodes_by_id, (data) => ({
+    data,
+  }))
+
+  return {
+    nodes,
+    edges,
+    elements: [...nodes, ...edges],
+  }
 }

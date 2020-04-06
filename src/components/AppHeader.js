@@ -1,19 +1,20 @@
 import React from 'react'
 import styled from 'styled-components'
-import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import Autocomplete from '@material-ui/lab/Autocomplete'
+import _ from 'lodash'
 
-function AppHeader({ selected, onUnselect }) {
-  let disabled = false
-  if (!selected) {
-    selected = 'n/a'
-    disabled = true
-  }
+function AppHeader({ selected, options, onChangeSelect }) {
+  const value = _.find(options, ({ data: { id } }) => id === selected) || null
   return (
     <Root>
-      <div>Selected: {selected}</div>
-      <Button onClick={onUnselect} disabled={disabled}>
-        Clear
-      </Button>
+      <AutocompleteStyled
+        options={options}
+        value={value}
+        getOptionLabel={(option) => option.data.id}
+        renderInput={(params) => <TextField {...params} label="Selected System or Data" />}
+        onChange={(event, value, reason) => onChangeSelect(_.get(value, 'data.id'))}
+      />
     </Root>
   )
 }
@@ -28,4 +29,8 @@ const Root = styled.div`
   & > *:not(:first-child) {
     margin-left: 1rem;
   }
+`
+
+const AutocompleteStyled = styled(Autocomplete)`
+  width: 400px;
 `
