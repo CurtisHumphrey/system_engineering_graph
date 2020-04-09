@@ -2,16 +2,23 @@ import React from 'react'
 import styled from 'styled-components'
 import CytoscapeComponent from 'react-cytoscapejs'
 import cytoscape from 'cytoscape'
-import cola from 'cytoscape-cola'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory, useParams, useLocation } from 'react-router-dom'
 
 import AppHeader from './AppHeader'
-
 import parse_context_to_elements from '../graph_logic/parse_context_to_elements'
 
-cytoscape.use(cola)
+import fcose from 'cytoscape-fcose'
 
-const layout = { name: 'cola', nodeDimensionsIncludeLabels: true, animate: true }
+cytoscape.use(fcose)
+
+const layout = {
+  name: 'fcose',
+  quality: 'proof',
+  nodeDimensionsIncludeLabels: true,
+  animate: true,
+  idealEdgeLength: 80,
+  nodeRepulsion: 90000,
+}
 
 function background_color(node) {
   switch (node.data('type')) {
@@ -71,6 +78,16 @@ const stylesheet = [
       'text-outline-color': outline_color,
       'background-color': background_color,
       'border-color': outline_color,
+      width: 30,
+      height: 30,
+    },
+  },
+  {
+    selector: 'node:selected',
+    style: {
+      'font-size': 15,
+      width: 50,
+      height: 50,
     },
   },
   {
@@ -111,6 +128,7 @@ function App() {
   const [selected_name, set_selected] = React.useState('')
   const history = useHistory()
   const { focus_id } = useParams()
+  const { pathname } = useLocation()
 
   const onUnselect = React.useCallback(() => {
     const cy = cy_ref.current
@@ -118,15 +136,26 @@ function App() {
     history.push('/')
 
     cy.elements().style('display', 'element')
+    cy.elements().unselect()
     cy.elements().layout(layout).run()
   }, [history])
+
+  const change_location = React.useCallback(
+    (id) => {
+      const next = `/focus-on/${better_id(id)}`
+      if (next === pathname) return
+      history.push(next)
+    },
+    [pathname, history],
+  )
 
   const onSelect = React.useCallback(
     (id) => {
       const cy = cy_ref.current
       const node = cy.getElementById(id)
+      node.select()
       set_selected(id)
-      history.push(`/focus-on/${better_id(id)}`)
+      change_location(id)
 
       let subgraph = node.closedNeighborhood()
       subgraph = subgraph.merge(node.predecessors())
@@ -134,7 +163,7 @@ function App() {
       subgraph.style('display', 'element')
       subgraph.layout(layout).run()
     },
-    [history],
+    [change_location],
   )
 
   const onChangeSelect = React.useCallback(
