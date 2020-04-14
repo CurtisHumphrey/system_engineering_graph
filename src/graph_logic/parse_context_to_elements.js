@@ -17,7 +17,7 @@ export default function parse_context_to_elements(require_context) {
   return matches_to_elements(matches)
 }
 
-//               ( 1      )     ( 2 )     (   3   ) ( 4      )     ( 5 )          (6 )
+//               ( 1      )     ( 2 )   (   3   ) ( 4      )     ( 5 )        (6 )
 const pattern = /^([^[]+)(?:\[(\w+)\])? (<--|-->) ([^[]+)(?:\[(\w+)\])?(?: : (.+)$)/
 
 function get_matches(filename, lines) {
