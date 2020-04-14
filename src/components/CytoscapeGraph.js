@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import CytoscapeComponent from 'react-cytoscapejs'
 import cytoscape from 'cytoscape'
+import _ from 'lodash'
 
 import fcose from 'cytoscape-fcose'
 
@@ -16,30 +17,44 @@ export const layout = {
   nodeRepulsion: 90000,
 }
 
+const node_styles = {
+  data: {
+    background_color: 'hsl(117, 30%, 87%)',
+    outline_color: 'hsl(98, 34%, 55%)',
+    shape: 'ellipse',
+  },
+  'system/vender': {
+    background_color: 'hsl(210, 85%, 92%)',
+    outline_color: 'hsl(210, 39%, 59%)',
+    shape: 'round-rectangle',
+  },
+  'system/process': {
+    background_color: 'hsl(250, 85%, 92%)',
+    outline_color: 'hsl(250, 39%, 59%)',
+    shape: 'round-pentagon',
+  },
+  'system/custom': {
+    background_color: 'hsl(300, 85%, 92%)',
+    outline_color: 'hsl(300, 39%, 59%)',
+    shape: 'round-hexagon',
+  },
+  default: {
+    background_color: 'red',
+    outline_color: 'red',
+    shape: 'octagon',
+  },
+}
+
+function get_style(node, attribute) {
+  return _.defaultTo(node_styles[node.data('type')], node_styles.default)[attribute]
+}
+
 function background_color(node) {
-  switch (node.data('type')) {
-    case 'data':
-      return '#D5E8D4'
-    case 'system':
-      return '#DAE8FC'
-    case 'more':
-      return '#EEE'
-    default:
-      return 'red'
-  }
+  return get_style(node, 'background_color')
 }
 
 function outline_color(node) {
-  switch (node.data('type')) {
-    case 'data':
-      return '#82B366'
-    case 'system':
-      return '#6C8EBF'
-    case 'more':
-      return '#999'
-    default:
-      return 'red'
-  }
+  return get_style(node, 'outline_color')
 }
 
 const stylesheet = [
@@ -47,24 +62,10 @@ const stylesheet = [
     selector: 'node',
     style: {
       label(node) {
-        switch (node.data('type')) {
-          case 'more':
-            return '+'
-          default:
-            return node.data('id')
-        }
+        return node.data('id')
       },
       shape(node) {
-        switch (node.data('type')) {
-          case 'data':
-            return 'round-hexagon'
-          case 'system':
-            return 'round-rectangle'
-          case 'more':
-            return 'circle'
-          default:
-            return 'octagon'
-        }
+        return get_style(node, 'shape')
       },
       'text-valign': 'center',
       color: 'white',
