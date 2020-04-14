@@ -29,8 +29,8 @@ function AppHeader({ selected, options, onChangeSelect, onChangeDepth, maxDepth,
       <StyledSlider
         step={1}
         marks
-        min={0}
-        max={maxDepth}
+        min={1}
+        max={Math.max(1, maxDepth)}
         value={currentDepth}
         disabled={maxDepth <= 0}
         onChange={handleSliderChange}
